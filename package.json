@@ -1,0 +1,21 @@
+{
+  "name": "nightfury",
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "bun --hot ./index.tsx"
+  },
+  "type": "module",
+  "dependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  }
+}

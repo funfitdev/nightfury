@@ -1,4 +1,5 @@
 import { renderToReadableStream } from "react-dom/server";
+import { handleAPI, getOpenAPISpec } from "./src/api";
 
 function App() {
   return (
@@ -88,20 +89,7 @@ async function reactSSRHandler(_req: Request): Promise<Response> {
 
 const server = Bun.serve({
   routes: {
-    // ...existing routes...
-    "/api/status": new Response("OK"),
-    "/users/:id": (req) => {
-      return new Response(`Hello User ${req.params.id}!`);
-    },
-    "/api/posts": {
-      GET: () => new Response("List posts"),
-      POST: async (req) => {
-        const body = await req.json();
-        const data = typeof body === "object" && body !== null ? body : {};
-        return Response.json({ created: true, ...data });
-      },
-    },
-    // HTMX API endpoints
+    // HTMX API endpoints (specific routes before wildcard)
     "/api/htmx/greeting": () =>
       new Response("<p><strong>Hello!</strong> Greetings from the server.</p>", {
         headers: { "Content-Type": "text/html" },
@@ -125,13 +113,17 @@ const server = Bun.serve({
           headers: { "Content-Type": "text/html" },
         }),
     },
-    "/api/*": Response.json({ message: "Not found" }, { status: 404 }),
+    // REST API routes (OpenAPI) - handles /api/health, /api/users/*, /api/posts/*, /api/echo
+    "/api/*": handleAPI,
+    // OpenAPI spec
+    "/openapi.json": () => Response.json(getOpenAPISpec()),
+    // Other routes
     "/blog/hello": Response.redirect("/blog/hello/world"),
     "/favicon.ico": Bun.file("./favicon.ico"),
-    // New SSR route
+    // SSR route
     "/ssr": reactSSRHandler,
   },
-  fetch(req) {
+  fetch(_req) {
     return new Response("Not Found", { status: 404 });
   },
 });

@@ -15,7 +15,11 @@
   },
   "type": "module",
   "dependencies": {
+    "@orpc/client": "^1.13.2",
+    "@orpc/openapi": "^1.13.2",
+    "@orpc/server": "^1.13.2",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "zod": "^4.2.1"
   }
 }

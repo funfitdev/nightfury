@@ -8,7 +8,7 @@ dist
 
 # generated files
 src/routes.generated.tsx
-src/styles/output.css
+public/styles.css
 
 # code coverage
 coverage

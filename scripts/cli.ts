@@ -64,7 +64,7 @@ export async function handleUIRoutes(req: Request): Promise<Response | null> {
 
 // Build Tailwind CSS
 function buildCSS(watchMode = false) {
-  const args = ["bun", "tailwindcss", "-i", "src/styles/main.css", "-o", "src/styles/output.css"];
+  const args = ["bun", "tailwindcss", "-i", "src/styles/main.css", "-o", "public/styles.css"];
   if (!watchMode) args.push("--minify");
   if (watchMode) args.push("--watch");
 

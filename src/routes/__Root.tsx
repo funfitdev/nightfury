@@ -1,5 +1,3 @@
-import css from "../styles/output.css" with { type: "text" };
-
 const isDev = process.env.NODE_ENV !== "production";
 
 const liveReloadScript = `
@@ -17,7 +15,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>NightFury App</title>
-        <style dangerouslySetInnerHTML={{ __html: css }} />
+        <link rel="stylesheet" href="/styles.css" />
         {isDev && <script dangerouslySetInnerHTML={{ __html: liveReloadScript }} />}
       </head>
       <body className="bg-gray-100 font-sans max-w-5xl mx-auto p-8">

@@ -132,6 +132,14 @@ const server = Bun.serve({
     // Other routes
     "/blog/hello": Response.redirect("/blog/hello/world"),
     "/favicon.ico": Bun.file("./favicon.ico"),
+    // Static assets with caching
+    "/styles.css": () =>
+      new Response(Bun.file("./public/styles.css"), {
+        headers: {
+          "Content-Type": "text/css",
+          "Cache-Control": isDev ? "no-cache" : "public, max-age=31536000, immutable",
+        },
+      }),
     // SSR route
     "/ssr": reactSSRHandler,
   },

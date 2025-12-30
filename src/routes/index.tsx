@@ -31,6 +31,25 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/mwm-ui/popover";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/mwm-ui/sheet";
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerClose,
+} from "@/components/mwm-ui/drawer";
 import { AlertCircle, Terminal } from "lucide-react";
 
 export default function HomePage() {
@@ -46,7 +65,7 @@ export default function HomePage() {
         <h2 className="mb-4 text-lg font-semibold">Popover Demo</h2>
         <Popover>
           <PopoverTrigger className="rounded-md bg-primary px-4 py-2 text-primary-foreground">
-            Open Popover
+            Open Popover 2
           </PopoverTrigger>
           <PopoverContent sideOffset={4} align="start">
             <p className="text-sm">
@@ -108,11 +127,11 @@ export default function HomePage() {
         <h2 className="mb-4 text-lg font-semibold">Dialog Demo</h2>
         <Dialog>
           <DialogTrigger className={buttonVariants({ variant: "outline" })}>
-            Open Dialog
+            Open Dialog 2
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit Profile</DialogTitle>
+              <DialogTitle>Edit Profile 2</DialogTitle>
               <DialogDescription>
                 Make changes to your profile here. Click outside or press Escape
                 to close.
@@ -153,6 +172,103 @@ export default function HomePage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="mb-4 text-lg font-semibold">Sheet Demo</h2>
+        <div className="flex gap-2">
+          <Sheet>
+            <SheetTrigger className={buttonVariants({ variant: "outline" })}>
+              Open Sheet (Right)
+            </SheetTrigger>
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Edit Profile</SheetTitle>
+                <SheetDescription>
+                  Make changes to your profile here. Click outside or press
+                  Escape to close.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex-1 p-4">
+                <p className="text-sm text-muted-foreground">
+                  This sheet uses the native HTML popover API.
+                </p>
+              </div>
+              <SheetFooter>
+                <Button variant="outline">Cancel</Button>
+                <Button>Save changes</Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+          <Sheet>
+            <SheetTrigger className={buttonVariants({ variant: "outline" })}>
+              Open Sheet (Left)
+            </SheetTrigger>
+            <SheetContent side="left">
+              <SheetHeader>
+                <SheetTitle>Navigation</SheetTitle>
+                <SheetDescription>Browse the menu options.</SheetDescription>
+              </SheetHeader>
+              <div className="flex-1 p-4">
+                <p className="text-sm text-muted-foreground">
+                  Left-side sheet for navigation menus.
+                </p>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="mb-4 text-lg font-semibold">Drawer Demo</h2>
+        <div className="flex gap-2">
+          <Drawer direction="bottom">
+            <DrawerTrigger className={buttonVariants({ variant: "outline" })}>
+              Open Drawer (Bottom)
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Move Goal</DrawerTitle>
+                <DrawerDescription>
+                  Set your daily activity goal.
+                </DrawerDescription>
+              </DrawerHeader>
+              <div className="p-4">
+                <p className="text-sm text-muted-foreground">
+                  This drawer uses the native HTML popover API with a drag
+                  handle indicator.
+                </p>
+              </div>
+              <DrawerFooter>
+                <Button>Submit</Button>
+                <DrawerClose className={buttonVariants({ variant: "outline" })}>
+                  Cancel
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+          <Drawer direction="right">
+            <DrawerTrigger className={buttonVariants({ variant: "outline" })}>
+              Open Drawer (Right)
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Settings</DrawerTitle>
+                <DrawerDescription>Adjust your preferences.</DrawerDescription>
+              </DrawerHeader>
+              <div className="flex-1 p-4">
+                <p className="text-sm text-muted-foreground">
+                  Right-side drawer variant.
+                </p>
+              </div>
+              <DrawerFooter>
+                <DrawerClose className={buttonVariants({ variant: "outline" })}>
+                  Close
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+        </div>
       </div>
     </div>
   );

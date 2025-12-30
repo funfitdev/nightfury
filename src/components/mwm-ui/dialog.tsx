@@ -86,10 +86,11 @@ function DialogContent({
   return (
     <div
       id={dialogId}
-      popover="manual"
+      popover="auto"
       data-slot="dialog-content"
       className={cn(
-        "bg-background fixed top-1/2 left-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border p-6 shadow-lg outline-none sm:max-w-lg",
+        "bg-background fixed top-1/2 left-1/2 z-50 hidden w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border p-6 shadow-lg sm:max-w-lg",
+        "[&:popover-open]:grid",
         className
       )}
       {...props}
@@ -101,9 +102,9 @@ function DialogContent({
           data-slot="dialog-close"
           popoverTarget={dialogId}
           popoverTargetAction="hide"
-          className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+          className="absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100"
         >
-          <XIcon />
+          <XIcon className="size-4" />
           <span className="sr-only">Close</span>
         </button>
       )}

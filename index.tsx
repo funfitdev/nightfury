@@ -1,5 +1,6 @@
 import { renderToReadableStream } from "react-dom/server";
 import { handleAPI, getOpenAPISpec } from "./src/api";
+import { routes } from "./src/routes";
 
 function App() {
   return (
@@ -89,11 +90,15 @@ async function reactSSRHandler(_req: Request): Promise<Response> {
 
 const server = Bun.serve({
   routes: {
+    ...routes,
     // HTMX API endpoints (specific routes before wildcard)
     "/api/htmx/greeting": () =>
-      new Response("<p><strong>Hello!</strong> Greetings from the server.</p>", {
-        headers: { "Content-Type": "text/html" },
-      }),
+      new Response(
+        "<p><strong>Hello!</strong> Greetings from the server.</p>",
+        {
+          headers: { "Content-Type": "text/html" },
+        }
+      ),
     "/api/htmx/echo": {
       POST: async (req) => {
         const formData = await req.formData();
@@ -104,9 +109,12 @@ const server = Bun.serve({
       },
     },
     "/api/htmx/time": () =>
-      new Response(`<p>Server time: <strong>${new Date().toLocaleTimeString()}</strong></p>`, {
-        headers: { "Content-Type": "text/html" },
-      }),
+      new Response(
+        `<p>Server time: <strong>${new Date().toLocaleTimeString()}</strong></p>`,
+        {
+          headers: { "Content-Type": "text/html" },
+        }
+      ),
     "/api/htmx/item": {
       DELETE: () =>
         new Response("<p><em>Item deleted successfully!</em></p>", {

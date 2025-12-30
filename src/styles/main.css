@@ -140,4 +140,15 @@
   details[data-slot="accordion-item"] .accordion-content > div {
     overflow: hidden;
   }
+
+  /* Dialog/Popover - hidden by default, grid when open */
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"] {
+    display: none !important;
+  }
+
+  [data-slot="dialog-content"]:popover-open,
+  [data-slot="alert-dialog-content"]:popover-open {
+    display: grid !important;
+  }
 }

@@ -24,13 +24,20 @@ async function generateRoutes() {
       route = "/" + route.replace(/\./g, "/");
     }
 
-    routes.push({ path: route, importPath: `./routes/${file.replace(/\.tsx$/, "")}` });
+    routes.push({
+      path: route,
+      importPath: `./routes/${file.replace(/\.tsx$/, "")}`,
+    });
   }
 
   routes.sort((a, b) => a.path.localeCompare(b.path));
 
-  const imports = routes.map((r, i) => `import Route${i} from "${r.importPath}";`).join("\n");
-  const routeEntries = routes.map((r, i) => `  "${r.path}": createSSRHandler(Route${i}),`).join("\n");
+  const imports = routes
+    .map((r, i) => `import Route${i} from "${r.importPath}";`)
+    .join("\n");
+  const routeEntries = routes
+    .map((r, i) => `  "${r.path}": createSSRHandler(Route${i}),`)
+    .join("\n");
 
   const content = `// Auto-generated - do not edit
 import { renderToReadableStream } from "react-dom/server";
@@ -67,9 +74,16 @@ export async function handleUIRoutes(req: Request): Promise<Response | null> {
 
 // Build Tailwind CSS
 function buildCSS(watchMode = false) {
-  const args = ["bun", "tailwindcss", "-i", "src/styles/main.css", "-o", "public/styles.css"];
+  const args = [
+    "bun",
+    "tailwindcss",
+    "-i",
+    "src/styles/main.css",
+    "-o",
+    "public/styles.css",
+  ];
   if (!watchMode) args.push("--minify");
-  if (watchMode) args.push("--watch");
+  if (watchMode) args.push("--watch=always");
 
   return Bun.spawn(args, {
     cwd: projectRoot,
@@ -85,12 +99,16 @@ async function dev() {
   await generateRoutes();
 
   const routesDir = import.meta.dir + "/../src/routes";
-  const watcher = watch(routesDir, { recursive: true }, async (_event, filename) => {
-    if (filename?.endsWith(".tsx") && !filename.startsWith("__")) {
-      console.log(`\n📁 Route changed: ${filename}`);
-      await generateRoutes();
+  const watcher = watch(
+    routesDir,
+    { recursive: true },
+    async (_event, filename) => {
+      if (filename?.endsWith(".tsx") && !filename.startsWith("__")) {
+        console.log(`\n📁 Route changed: ${filename}`);
+        await generateRoutes();
+      }
     }
-  });
+  );
 
   console.log("🎨 Starting Tailwind CSS...");
   const tailwind = buildCSS(true);

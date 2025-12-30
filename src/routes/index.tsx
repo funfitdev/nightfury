@@ -8,7 +8,7 @@ import {
 export default function HomePage() {
   return (
     <div>
-      <h1 className="bg-green-300">Home Screen</h1>
+      <h1 className="bg-blue-300">Home Screen</h1>
       <p>Welcome to mwm App!</p>
       <p>
         This is the root route at <code>/</code>

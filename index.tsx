@@ -1,6 +1,8 @@
 import { renderToReadableStream } from "react-dom/server";
 import { handleAPI, getOpenAPISpec } from "./src/api";
-import { routes } from "./src/routes";
+// Use generated routes for production builds (static imports)
+// For dev, this file is generated before the build
+import { routes } from "./src/routes.generated";
 
 function App() {
   return (

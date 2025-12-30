@@ -2,16 +2,20 @@
   "name": "nightfury",
   "module": "index.ts",
   "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
     "@types/bun": "latest",
     "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.1.18"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "private": true,
   "scripts": {
-    "dev": "bun --hot ./index.tsx"
+    "dev": "bun scripts/cli.ts dev",
+    "build": "bun scripts/cli.ts build",
+    "start": "./dist/server"
   },
   "type": "module",
   "dependencies": {

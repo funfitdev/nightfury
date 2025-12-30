@@ -6,6 +6,10 @@ out
 dist
 *.tgz
 
+# generated files
+src/routes.generated.tsx
+src/styles/output.css
+
 # code coverage
 coverage
 *.lcov

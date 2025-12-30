@@ -92,11 +92,47 @@ function buildCSS(watchMode = false) {
   });
 }
 
+// Build client-side JavaScript
+async function buildJS(watchMode = false) {
+  const entrypoint = resolve(projectRoot, "src/client/main.ts");
+
+  async function bundle() {
+    const result = await Bun.build({
+      entrypoints: [entrypoint],
+      outdir: resolve(projectRoot, "public"),
+      naming: "bundle.js",
+      minify: !watchMode,
+      sourcemap: watchMode ? "inline" : "none",
+      target: "browser",
+    });
+
+    if (!result.success) {
+      console.error("JS build failed:", result.logs);
+    } else {
+      console.log("✓ Built JS bundle");
+    }
+    return result;
+  }
+
+  await bundle();
+
+  if (watchMode) {
+    const clientDir = resolve(projectRoot, "src/client");
+    watch(clientDir, { recursive: true }, async (_event, filename) => {
+      if (filename?.endsWith(".ts") || filename?.endsWith(".tsx")) {
+        console.log(`\n📦 Client changed: ${filename}`);
+        await bundle();
+      }
+    });
+  }
+}
+
 // Dev mode
 async function dev() {
   console.log("🚀 Starting development server...\n");
 
   await generateRoutes();
+  await buildJS(true);
 
   const routesDir = import.meta.dir + "/../src/routes";
   const watcher = watch(
@@ -138,6 +174,7 @@ async function build() {
   console.log("📦 Building for production...\n");
 
   await generateRoutes();
+  await buildJS(false);
 
   const tailwind = buildCSS(false);
   await tailwind.exited;

@@ -26,7 +26,7 @@ export function getOpenAPISpec() {
     try {
       openAPISpec = openAPIGenerator.generate(appRouter, {
         info: {
-          title: "Nightfury API",
+          title: "mwm API",
           version: "1.0.0",
           description: "RESTful API built with oRPC and Bun",
         },

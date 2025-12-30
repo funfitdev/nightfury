@@ -1,5 +1,8 @@
 import { Glob, $ } from "bun";
 import { watch } from "fs";
+import { resolve } from "path";
+
+const projectRoot = resolve(import.meta.dir, "..");
 
 // Generate routes
 async function generateRoutes() {
@@ -69,6 +72,7 @@ function buildCSS(watchMode = false) {
   if (watchMode) args.push("--watch");
 
   return Bun.spawn(args, {
+    cwd: projectRoot,
     stdout: "inherit",
     stderr: "inherit",
   });
@@ -95,6 +99,7 @@ async function dev() {
 
   console.log("🔥 Starting Bun server with hot reload...\n");
   const server = Bun.spawn(["bun", "--hot", "./index.tsx"], {
+    cwd: projectRoot,
     stdout: "inherit",
     stderr: "inherit",
   });
@@ -120,7 +125,7 @@ async function build() {
   await tailwind.exited;
   console.log("✓ Built CSS");
 
-  await $`bun build ./index.tsx --compile --outfile=dist/server`;
+  await $`cd ${projectRoot} && bun build ./index.tsx --compile --outfile=dist/server`;
   console.log("✓ Compiled server binary");
 
   console.log("\n✅ Build complete! Run with: ./dist/server");

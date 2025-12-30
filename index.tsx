@@ -90,6 +90,8 @@ async function reactSSRHandler(_req: Request): Promise<Response> {
   });
 }
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const server = Bun.serve({
   routes: {
     ...routes,
@@ -133,9 +135,28 @@ const server = Bun.serve({
     // SSR route
     "/ssr": reactSSRHandler,
   },
-  fetch(_req) {
+  fetch(req, server) {
+    // Handle live reload WebSocket upgrade in dev mode
+    if (isDev && new URL(req.url).pathname === "/__reload") {
+      if (server.upgrade(req)) return;
+      return new Response("WebSocket upgrade failed", { status: 400 });
+    }
     return new Response("Not Found", { status: 404 });
   },
+  websocket: {
+    open(ws) {
+      ws.subscribe("reload");
+    },
+    message() {},
+    close(ws) {
+      ws.unsubscribe("reload");
+    },
+  },
 });
+
+// Notify all clients to reload when server restarts (hot reload)
+if (isDev) {
+  server.publish("reload", "reload");
+}
 
 console.log(`Server running at ${server.url}`);

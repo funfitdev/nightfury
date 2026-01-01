@@ -105,8 +105,8 @@ import {
   createGuestSession,
   type RequestContext,
   type AuthSession,
-} from "./context";
-import { OutletProvider } from "./outlet";
+} from "@/lib/context";
+import { OutletProvider } from "@/components/outlet";
 
 // Import route modules
 ${imports}
@@ -423,7 +423,7 @@ function buildCSS(watchMode = false) {
     "bun",
     "tailwindcss",
     "-i",
-    "src/styles/main.css",
+    "src/globals.css",
     "-o",
     "public/styles.css",
   ];

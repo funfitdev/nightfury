@@ -1,4 +1,4 @@
-import { getParams } from "@/context";
+import { getParams } from "@/lib/context";
 
 export default function EditUserPage() {
   const { id } = getParams();

@@ -1,4 +1,4 @@
-import { Outlet } from "@/outlet";
+import { Outlet } from "@/components/outlet";
 
 export default function UsersLayout() {
   return (

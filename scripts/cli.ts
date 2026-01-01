@@ -24,6 +24,9 @@ async function generateRoutes() {
       route = "/" + route.replace(/\./g, "/");
     }
 
+    // Convert $param to :param for dynamic route segments
+    route = route.replace(/\/\$([^/]+)/g, "/:$1");
+
     routes.push({
       path: route,
       importPath: `./routes/${file.replace(/\.tsx$/, "")}`,
@@ -90,11 +93,11 @@ async function getAuthSession(_req: Request): Promise<AuthSession> {
 
 // Create request context for a request
 async function createRequestContext(
-  req: Request,
-  params: Record<string, string> = {}
+  req: Request & { params?: Record<string, string> }
 ): Promise<RequestContext> {
   const url = new URL(req.url);
   const session = await getAuthSession(req);
+  const params = req.params ?? {};
   return { request: req, url, params, searchParams: url.searchParams, session };
 }
 
@@ -237,23 +240,77 @@ export const routes: Record<string, BunRouteHandler> = {
 ${routeEntries}
 };
 
+// Match a URL path against a route pattern with :param segments
+function matchRoute(
+  pattern: string,
+  pathname: string
+): Record<string, string> | null {
+  const patternParts = pattern.split("/");
+  const pathParts = pathname.split("/");
+
+  if (patternParts.length !== pathParts.length) return null;
+
+  const params: Record<string, string> = {};
+
+  for (let i = 0; i < patternParts.length; i++) {
+    const patternPart = patternParts[i]!;
+    const pathPart = pathParts[i]!;
+
+    if (patternPart.startsWith(":")) {
+      // Dynamic segment - extract param
+      params[patternPart.slice(1)] = decodeURIComponent(pathPart);
+    } else if (patternPart !== pathPart) {
+      // Static segment mismatch
+      return null;
+    }
+  }
+
+  return params;
+}
+
+// Find matching route and extract params
+function findRoute(
+  pathname: string
+): { pattern: string; params: Record<string, string> } | null {
+  // Try exact match first (faster for static routes)
+  if (routes[pathname]) {
+    return { pattern: pathname, params: {} };
+  }
+
+  // Try pattern matching for dynamic routes
+  for (const pattern of Object.keys(routes)) {
+    if (!pattern.includes(":")) continue;
+    const params = matchRoute(pattern, pathname);
+    if (params) {
+      return { pattern, params };
+    }
+  }
+
+  return null;
+}
+
 export async function handleUIRoutes(req: Request): Promise<Response | null> {
   const url = new URL(req.url);
-  const handler = routes[url.pathname];
+  const match = findRoute(url.pathname);
 
-  if (!handler) return null;
+  if (!match) return null;
+
+  const handler = routes[match.pattern]!;
+
+  // Create a request with params attached
+  const reqWithParams = Object.assign(req, { params: match.params });
 
   // If handler is a function, call it directly
   if (typeof handler === "function") {
-    return handler(req);
+    return handler(reqWithParams);
   }
 
   // Handler is an object with method handlers
-  const method = req.method as keyof typeof handler;
+  const method = req.method as "GET" | "POST" | "PUT" | "DELETE";
   const methodHandler = handler[method];
 
   if (methodHandler) {
-    return methodHandler(req);
+    return methodHandler(reqWithParams);
   }
 
   // Method not allowed

@@ -5,3 +5,19 @@
 - use prisma
 - orpc
 - export default, GET, POST, PUT, DELETE
+
+- mwm
+- /identity @mwm/identity
+- /cms @mwm/cms
+- /crm @mwm/crm
+- /ecom @mwm/ecom
+
+- I want to build a framework
+- main identity + cms + crm
+
+```
+bunx --bun prisma migrate dev --name init
+bunx --bun prisma generate
+
+bunx --bun prisma migrate deploy
+```

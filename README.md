@@ -23,8 +23,6 @@ bunx --bun prisma migrate deploy
 ```
 
 ```
-dynamic path - typed
-layout
-query param - typed
+statics
 middleware
 ```

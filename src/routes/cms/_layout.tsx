@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/nav/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/mwm-ui/sidebar";
 import { Outlet } from "@/components/outlet";
 import { requireAuthAsync } from "@/lib/session";

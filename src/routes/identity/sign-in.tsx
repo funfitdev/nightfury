@@ -14,8 +14,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/mwm-ui/card";
-import { FieldError } from "@/components/field-error";
-import { GlobalError } from "@/components/global-error";
+import { FieldError, GlobalError } from "@/components/form-errors";
 
 // Zod schema for sign-in form validation
 const signInSchema = z.object({

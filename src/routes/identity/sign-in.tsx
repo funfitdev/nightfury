@@ -1,6 +1,8 @@
+import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { sessionManager, redirectWithCookie } from "@/lib/session";
+import { sessionManager } from "@/lib/session";
 import { getSearchParams } from "@/lib/context";
+import { parseFormData, htmxRedirect, type FormState } from "@/lib/form";
 import { Button } from "@/components/mwm-ui/button";
 import { Input } from "@/components/mwm-ui/input";
 import { Label } from "@/components/mwm-ui/label";
@@ -12,18 +14,40 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/mwm-ui/card";
-import { Alert, AlertTitle, AlertDescription } from "@/components/mwm-ui/alert";
-import { AlertCircle } from "lucide-react";
+import { FieldError } from "@/components/field-error";
+import { GlobalError } from "@/components/global-error";
+
+// Zod schema for sign-in form validation
+const signInSchema = z.object({
+  email: z.email({ error: "Please enter a valid email address" }),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+  returnUrl: z.string().optional().default("/"),
+});
+
+type SignInData = z.infer<typeof signInSchema>;
+type SignInFormState = FormState<SignInData> & { returnUrl?: string };
 
 export async function POST(req: Request) {
   const formData = await req.formData();
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
   const returnUrl = (formData.get("returnUrl") as string) || "/";
 
-  if (!email || !password) {
-    return <SignInForm error="Email and password are required" returnUrl={returnUrl} />;
+  // Validate with Zod
+  const result = parseFormData(signInSchema, formData);
+
+  if (!result.success) {
+    return (
+      <SignInForm
+        values={{ email: formData.get("email") as string }}
+        fieldErrors={result.fieldErrors}
+        returnUrl={returnUrl}
+      />
+    );
   }
+
+  const { email, password } = result.data;
 
   // Find user by email
   const user = await prisma.user.findUnique({
@@ -32,7 +56,13 @@ export async function POST(req: Request) {
   });
 
   if (!user || !user.credentials) {
-    return <SignInForm error="Invalid email or password" returnUrl={returnUrl} />;
+    return (
+      <SignInForm
+        values={{ email }}
+        globalError="Invalid email or password"
+        returnUrl={returnUrl}
+      />
+    );
   }
 
   // Verify password using Bun.password.verify
@@ -42,12 +72,24 @@ export async function POST(req: Request) {
   );
 
   if (!isValidPassword) {
-    return <SignInForm error="Invalid email or password" returnUrl={returnUrl} />;
+    return (
+      <SignInForm
+        values={{ email }}
+        globalError="Invalid email or password"
+        returnUrl={returnUrl}
+      />
+    );
   }
 
   // Check if user is active
   if (!user.isActive) {
-    return <SignInForm error="Your account has been deactivated" returnUrl={returnUrl} />;
+    return (
+      <SignInForm
+        values={{ email }}
+        globalError="Your account has been deactivated"
+        returnUrl={returnUrl}
+      />
+    );
   }
 
   // Update last login time
@@ -67,19 +109,20 @@ export async function POST(req: Request) {
     req
   );
 
-  // Redirect to return URL with session cookie
-  return redirectWithCookie(returnUrl, cookie, 303);
+  return htmxRedirect(returnUrl, cookie);
 }
 
 function SignInForm({
-  error,
+  values,
+  fieldErrors,
+  globalError,
   returnUrl = "/",
-}: {
-  error?: string;
-  returnUrl?: string;
-}) {
+}: SignInFormState) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div
+      id="sign-in-form"
+      className="min-h-screen flex items-center justify-center bg-background p-4"
+    >
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Sign In</CardTitle>
@@ -88,16 +131,15 @@ function SignInForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form method="POST" className="flex flex-col gap-4">
+          <form
+            hx-post="/identity/sign-in"
+            hx-target="#sign-in-form"
+            hx-swap="outerHTML"
+            className="flex flex-col gap-4"
+          >
             <input type="hidden" name="returnUrl" value={returnUrl} />
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="size-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+            <GlobalError error={globalError} />
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
@@ -106,10 +148,12 @@ function SignInForm({
                 name="email"
                 type="email"
                 placeholder="you@example.com"
-                required
+                defaultValue={values?.email}
                 autoComplete="email"
                 autoFocus
+                aria-invalid={!!fieldErrors?.email}
               />
+              <FieldError errors={fieldErrors?.email} />
             </div>
 
             <div className="flex flex-col gap-2">
@@ -119,9 +163,10 @@ function SignInForm({
                 name="password"
                 type="password"
                 placeholder="Enter your password"
-                required
                 autoComplete="current-password"
+                aria-invalid={!!fieldErrors?.password}
               />
+              <FieldError errors={fieldErrors?.password} />
             </div>
 
             <Button type="submit" className="w-full mt-2">
@@ -131,7 +176,10 @@ function SignInForm({
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <a href="/identity/sign-up" className="text-primary hover:underline ml-1">
+          <a
+            href="/identity/sign-up"
+            className="text-primary hover:underline ml-1"
+          >
             Sign up
           </a>
         </CardFooter>

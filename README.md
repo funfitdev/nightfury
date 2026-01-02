@@ -1,10 +1,9 @@
 # mwm
 
-- use html to create dialog, popover, dropdown, alert, accordion experiences
-- add shadcn components one by one and make them work with framework without deps
-- use prisma
-- orpc
-- export default, GET, POST, PUT, DELETE
+- move api to routes folder
+- logging
+- blob storage
+- Role and permission management UI | Org Level, Super Level
 
 - mwm
 - /identity @mwm/identity
@@ -20,7 +19,7 @@ bunx --bun prisma migrate dev --name init
 bunx --bun prisma generate
 
 bunx prisma db seed
-bunx --bun prisma migrate deploy
+bunx prisma migrate deploy
 ```
 
 ```

@@ -5,7 +5,6 @@ import { initPopoverComponent } from "./popover";
 import { initToggleComponent } from "./toggle";
 import { initToggleGroupComponent } from "./toggle-group";
 import { initTabsComponent } from "./tabs";
-import { initDialogComponent } from "./dialog";
 
 // Initialize all components on DOM ready
 function initAllComponents() {
@@ -16,7 +15,6 @@ function initAllComponents() {
   initToggleComponent();
   initToggleGroupComponent();
   initTabsComponent();
-  initDialogComponent();
 }
 
 if (document.readyState === "loading") {

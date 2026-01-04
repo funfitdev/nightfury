@@ -178,8 +178,9 @@ function createStaticHandler(filePath: string, contentType: string) {
       headers: {
         "Content-Type": contentType,
         "Cache-Control": isDev
-          ? "no-cache"
+          ? "no-store, no-cache, must-revalidate"
           : "public, max-age=31536000, immutable",
+        ...(isDev && { "Pragma": "no-cache", "Expires": "0" }),
       },
     });
 }

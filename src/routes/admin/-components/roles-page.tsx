@@ -34,12 +34,12 @@ type Role = {
   };
 };
 
-interface RolesPageContentProps {
+interface RolesPageProps {
   roles: Role[];
   formState?: RoleFormState;
 }
 
-export function RolesPageContent({ roles, formState }: RolesPageContentProps) {
+export function RolesPage({ roles, formState }: RolesPageProps) {
   const hasErrors = !!formState?.fieldErrors || !!formState?.globalError;
 
   return (

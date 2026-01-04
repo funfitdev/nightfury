@@ -1,10 +1,7 @@
 import { prisma } from "@/lib/db";
 import { parseFormData } from "@/lib/form";
-import {
-  roleSchema,
-  type RoleFormState,
-} from "../-components/role-form";
-import { RolesPageContent } from "../-components/roles-page-content";
+import { roleSchema, type RoleFormState } from "../-components/role-form";
+import { RolesPage } from "../-components/roles-page";
 
 async function getRoles() {
   return prisma.role.findMany({
@@ -25,9 +22,9 @@ async function getRoles() {
   });
 }
 
-export default async function RolesPage() {
+export default async function RouteComponent() {
   const roles = await getRoles();
-  return <RolesPageContent roles={roles} />;
+  return <RolesPage roles={roles} />;
 }
 
 export async function POST(req: Request) {
@@ -44,7 +41,7 @@ export async function POST(req: Request) {
       },
       fieldErrors: result.fieldErrors,
     };
-    return <RolesPageContent roles={roles} formState={formState} />;
+    return <RolesPage roles={roles} formState={formState} />;
   }
 
   // Check if role name already exists
@@ -60,7 +57,7 @@ export async function POST(req: Request) {
         name: ["A role with this name already exists"],
       },
     };
-    return <RolesPageContent roles={roles} formState={formState} />;
+    return <RolesPage roles={roles} formState={formState} />;
   }
 
   await prisma.role.create({

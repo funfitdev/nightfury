@@ -122,6 +122,16 @@ function initAllPopovers() {
   popovers.forEach(initPopover);
 }
 
+// Opens any popover elements (dialogs, sheets) that have data-default-open attribute
+function openDefaultPopovers() {
+  const popovers = document.querySelectorAll<HTMLElement>("[data-default-open]");
+  popovers.forEach((el) => {
+    if (el.hasAttribute("popover")) {
+      el.showPopover();
+    }
+  });
+}
+
 // Click outside to close
 document.addEventListener("click", (e) => {
   const target = e.target as HTMLElement;
@@ -152,6 +162,7 @@ window.MWMPopover = MWMPopover;
 
 export function initPopoverComponent() {
   initAllPopovers();
+  openDefaultPopovers();
 }
 
 export { MWMPopover };

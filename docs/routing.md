@@ -144,14 +144,82 @@ export function GET(req: Request) {
 }
 ```
 
-## Partial Requests
+## Partial Requests & Root Wrapping
 
-Requests are treated as partial (no Root wrapper) when:
+All HTTP methods that return a React component are wrapped with `__Root` (the HTML shell) for full page requests. Partial requests skip the Root wrapper.
+
+### What Triggers a Partial Request?
 
 1. `HX-Request: true` header is present (HTMX)
 2. `?partial=yes` query parameter is set
 
-For POST/PUT/DELETE methods, responses are rendered as partials by default (for HTMX form handling). To render a full page on POST, return a `Response.redirect()` instead.
+### Behavior by HTTP Method
+
+| Method | Full Page Request | Partial Request (`HX-Request` or `?partial=yes`) |
+|--------|-------------------|--------------------------------------------------|
+| `default` | Wrapped with Root | Routes to `GET` export if exists, otherwise no Root |
+| `GET` | Wrapped with Root | No Root wrapper |
+| `POST` | Wrapped with Root | No Root wrapper |
+| `PUT` | Wrapped with Root | No Root wrapper |
+| `DELETE` | Wrapped with Root | No Root wrapper |
+
+### Key Behaviors
+
+**GET Requests:**
+- Full page GET → uses `default` export, wrapped with Root
+- Partial GET (`HX-Request` or `?partial=yes`) → uses `GET` export if defined, no Root
+- If no `GET` export exists, partial requests fall back to `default` export (without Root)
+
+**POST/PUT/DELETE Requests:**
+- Full page request returning a component → wrapped with Root
+- Partial request (`HX-Request` or `?partial=yes`) → no Root wrapper
+- Returning a `Response` object (e.g., redirect) → returned directly, no rendering
+
+### Examples
+
+**Form submission with full page re-render:**
+
+```tsx
+// If user submits form via regular browser POST (no JS),
+// they get a full page with Root wrapper
+export async function POST(req: Request) {
+  const formData = await req.formData();
+  // ... process form
+  return <ResultPage />;  // Wrapped with Root for full page
+}
+```
+
+**Form submission with HTMX:**
+
+```tsx
+// HTMX adds HX-Request header, so response is partial
+export async function POST(req: Request) {
+  const formData = await req.formData();
+  // ... process form
+  return <PartialResult />;  // No Root wrapper, just the component
+}
+```
+
+**Redirect after form submission (most common pattern):**
+
+```tsx
+export async function POST(req: Request) {
+  const formData = await req.formData();
+  // ... process form
+  return new Response(null, {
+    status: 302,
+    headers: { Location: "/success" },
+  });
+}
+```
+
+**Explicit partial request via query param:**
+
+```
+POST /api/items?partial=yes
+```
+
+This returns the component without Root wrapper, useful for programmatic fetches that don't use HTMX.
 
 ## Return Types
 

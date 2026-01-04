@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface DialogContextValue {
   dialogId: string;
+  defaultOpen?: boolean;
 }
 
 const DialogContext = React.createContext<DialogContextValue | null>(null);
@@ -19,56 +20,43 @@ function useDialogContext() {
 
 interface DialogProps {
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-function Dialog({ children }: DialogProps) {
+function Dialog({ children, defaultOpen }: DialogProps) {
   const id = React.useId();
   const dialogId = `dialog${id.replace(/:/g, "")}`;
 
   return (
-    <DialogContext.Provider value={{ dialogId }}>
+    <DialogContext.Provider value={{ dialogId, defaultOpen }}>
       {children}
     </DialogContext.Provider>
   );
 }
 
-interface DialogTriggerProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
-
-function DialogTrigger({ className, children, ...props }: DialogTriggerProps) {
-  const { dialogId } = useDialogContext();
-
-  return (
-    <button
-      type="button"
-      data-slot="dialog-trigger"
-      popoverTarget={dialogId}
-      className={className}
-      {...props}
-    >
-      {children}
-    </button>
-  );
+interface DialogTriggerProps {
+  children: React.ReactElement<{ popoverTarget?: string }>;
 }
 
-interface DialogCloseProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
-
-function DialogClose({ className, children, ...props }: DialogCloseProps) {
+function DialogTrigger({ children }: DialogTriggerProps) {
   const { dialogId } = useDialogContext();
 
-  return (
-    <button
-      type="button"
-      data-slot="dialog-close"
-      popoverTarget={dialogId}
-      popoverTargetAction="hide"
-      className={className}
-      {...props}
-    >
-      {children}
-    </button>
-  );
+  return React.cloneElement(children, {
+    popoverTarget: dialogId,
+  });
+}
+
+interface DialogCloseProps {
+  children: React.ReactElement<{ popoverTarget?: string; popoverTargetAction?: string }>;
+}
+
+function DialogClose({ children }: DialogCloseProps) {
+  const { dialogId } = useDialogContext();
+
+  return React.cloneElement(children, {
+    popoverTarget: dialogId,
+    popoverTargetAction: "hide",
+  });
 }
 
 interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -81,13 +69,14 @@ function DialogContent({
   showCloseButton = true,
   ...props
 }: DialogContentProps) {
-  const { dialogId } = useDialogContext();
+  const { dialogId, defaultOpen } = useDialogContext();
 
   return (
     <div
       id={dialogId}
       popover="auto"
       data-slot="dialog-content"
+      data-default-open={defaultOpen || undefined}
       className={cn(
         "bg-background fixed top-1/2 left-1/2 z-50 hidden w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border p-6 shadow-lg sm:max-w-lg",
         "[&:popover-open]:grid",

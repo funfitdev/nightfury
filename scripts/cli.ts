@@ -72,6 +72,8 @@ async function generateRoutes() {
     // Skip special files
     if (file.startsWith("__")) continue;
     if (file.endsWith("_layout.tsx")) continue;
+    // Skip files in folders starting with - (e.g., -components)
+    if (file.includes("/-") || file.startsWith("-")) continue;
 
     let route = file.replace(/\.tsx$/, "");
 
@@ -426,12 +428,13 @@ function createRouteHandler(
     handlers.POST = async (req: Request): Promise<Response> => {
       const ctx = await createRequestContext(req);
       return runWithContext(ctx, async () => {
+        const partial = isPartialRequest(req);
         const result = await module.POST!(req);
         if (result instanceof Response) {
           return result;
         }
-        // Result is a React element, render it as partial
-        return renderComponent(() => result, true, layouts, req);
+        // Result is a React element, render with Root if not partial
+        return renderComponent(() => result, partial, layouts, req);
       });
     };
   }
@@ -441,12 +444,13 @@ function createRouteHandler(
     handlers.PUT = async (req: Request): Promise<Response> => {
       const ctx = await createRequestContext(req);
       return runWithContext(ctx, async () => {
+        const partial = isPartialRequest(req);
         const result = await module.PUT!(req);
         if (result instanceof Response) {
           return result;
         }
-        // Result is a React element, render it as partial
-        return renderComponent(() => result, true, layouts, req);
+        // Result is a React element, render with Root if not partial
+        return renderComponent(() => result, partial, layouts, req);
       });
     };
   }
@@ -456,12 +460,13 @@ function createRouteHandler(
     handlers.DELETE = async (req: Request): Promise<Response> => {
       const ctx = await createRequestContext(req);
       return runWithContext(ctx, async () => {
+        const partial = isPartialRequest(req);
         const result = await module.DELETE!(req);
         if (result instanceof Response) {
           return result;
         }
-        // Result is a React element, render it as partial
-        return renderComponent(() => result, true, layouts, req);
+        // Result is a React element, render with Root if not partial
+        return renderComponent(() => result, partial, layouts, req);
       });
     };
   }

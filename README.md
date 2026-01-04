@@ -2,8 +2,11 @@
 
 - move api to routes folder
 - logging
-- blob storage
+- file storage
+- create auto routes
+- make params available via (req,params)
 - Role and permission management UI | Org Level, Super Level
+- Ai Response Streaming
 - /blog
 - /pages
 

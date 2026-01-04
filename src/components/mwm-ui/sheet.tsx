@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface SheetContextValue {
   sheetId: string;
+  defaultOpen?: boolean;
 }
 
 const SheetContext = React.createContext<SheetContextValue | null>(null);
@@ -19,14 +20,15 @@ function useSheetContext() {
 
 interface SheetProps {
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-function Sheet({ children }: SheetProps) {
+function Sheet({ children, defaultOpen }: SheetProps) {
   const id = React.useId();
   const sheetId = `sheet${id.replace(/:/g, "")}`;
 
   return (
-    <SheetContext.Provider value={{ sheetId }}>
+    <SheetContext.Provider value={{ sheetId, defaultOpen }}>
       {children}
     </SheetContext.Provider>
   );
@@ -83,7 +85,7 @@ function SheetContent({
   showCloseButton = true,
   ...props
 }: SheetContentProps) {
-  const { sheetId } = useSheetContext();
+  const { sheetId, defaultOpen } = useSheetContext();
 
   return (
     <div
@@ -91,6 +93,7 @@ function SheetContent({
       popover="auto"
       data-slot="sheet-content"
       data-side={side}
+      data-default-open={defaultOpen || undefined}
       className={cn(
         "bg-background fixed z-50 m-0 hidden max-h-none max-w-none flex-col gap-4 shadow-lg",
         "[&:popover-open]:flex",

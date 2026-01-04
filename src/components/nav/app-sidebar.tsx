@@ -10,10 +10,12 @@ import {
   IconFolder,
   IconHelp,
   IconInnerShadowTop,
+  IconKey,
   IconListDetails,
   IconReport,
   IconSearch,
   IconSettings,
+  IconShield,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -62,6 +64,16 @@ const data = {
       title: "Team",
       url: "#",
       icon: IconUsers,
+    },
+    {
+      title: "Roles",
+      url: "/admin/roles",
+      icon: IconShield,
+    },
+    {
+      title: "Permissions",
+      url: "/admin/permissions",
+      icon: IconKey,
     },
   ],
   navClouds: [

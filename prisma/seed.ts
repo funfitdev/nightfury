@@ -17,7 +17,7 @@ async function main() {
   const adminUser = await prisma.user.upsert({
     where: { email: ADMIN_EMAIL },
     update: {
-      name: "Admin User",
+      name: "Admin",
       isSuperAdmin: true,
       credentials: {
         upsert: {
@@ -28,7 +28,7 @@ async function main() {
     },
     create: {
       email: ADMIN_EMAIL,
-      name: "Admin User",
+      name: "Admin",
       isSuperAdmin: true,
       emailVerified: new Date(),
       credentials: {
@@ -39,6 +39,40 @@ async function main() {
   });
 
   console.log(`✅ Admin user created/updated: ${adminUser.email}`);
+
+  // Create default organization with admin as owner
+  const defaultOrg = await prisma.organization.upsert({
+    where: { slug: "acme" },
+    update: {
+      name: "Acme Inc",
+      ownerId: adminUser.id,
+    },
+    create: {
+      name: "Acme Inc",
+      slug: "acme",
+      description: "Default organization for the platform",
+      ownerId: adminUser.id,
+    },
+  });
+
+  console.log(`✅ Default organization created/updated: ${defaultOrg.name}`);
+
+  // Add admin as a member of the default organization
+  await prisma.organizationMember.upsert({
+    where: {
+      orgId_userId: {
+        orgId: defaultOrg.id,
+        userId: adminUser.id,
+      },
+    },
+    update: {},
+    create: {
+      orgId: defaultOrg.id,
+      userId: adminUser.id,
+    },
+  });
+
+  console.log(`✅ Admin user added as member of ${defaultOrg.name}`);
 
   // Create default roles
   const roles = [
@@ -100,13 +134,17 @@ async function main() {
       await prisma.permission.upsert({
         where: { name },
         update: {
-          displayName: `${action.charAt(0).toUpperCase() + action.slice(1)} ${resource}`,
+          displayName: `${
+            action.charAt(0).toUpperCase() + action.slice(1)
+          } ${resource}`,
           resource,
           action,
         },
         create: {
           name,
-          displayName: `${action.charAt(0).toUpperCase() + action.slice(1)} ${resource}`,
+          displayName: `${
+            action.charAt(0).toUpperCase() + action.slice(1)
+          } ${resource}`,
           description: `Allows ${action} operations on ${resource}`,
           resource,
           action,
